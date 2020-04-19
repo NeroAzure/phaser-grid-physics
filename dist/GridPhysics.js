@@ -46,17 +46,32 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/ 		}
 /******/ 	};
 /******/
 /******/ 	// define __esModule on exports
 /******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
 /******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -76,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -86,1262 +101,127 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _world = __webpack_require__(1);
+
+var _world2 = _interopRequireDefault(_world);
+
+var _tilemap = __webpack_require__(3);
+
+var _tilemap2 = _interopRequireDefault(_tilemap);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Tilemap = function () {
-  function Tilemap() {
-    _classCallCheck(this, Tilemap);
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-    this.tilemaps = [];
-    this.world = Phaser.Physics.GridPhysics.world;
-  }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * @author       Niklas Berg <nkholski@niklasberg.se>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * @copyright    2018 Niklas Berg
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * @license      {@link https://github.com/nkholski/phaser3-animated-tiles/blob/master/LICENSE|MIT License}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 
-  _createClass(Tilemap, [{
-    key: "collide",
-    value: function collide(source) {
-      var dx = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-      var dy = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-      var layers = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : this.world.tilemaplayers;
-      var slide = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+//
+// This plugin is based on Photonstorms Phaser 3 plugin template with added support for ES6.
+//
 
-      var position = void 0,
-          width = void 0,
-          height = void 0,
-          collideWorldBounds = void 0,
-          returnTile = void 0,
-          level = void 0,
-          callback = void 0;
+var GridPhysics = function (_Phaser$Plugins$Scene) {
+  _inherits(GridPhysics, _Phaser$Plugins$Scene);
 
-      // Sort out variables to work with, either from a sprite with a body or just an object
-      if (source.hasOwnProperty("body")) {
-        position = {
-          x: source.body.gridPosition.x,
-          y: source.body.gridPosition.y
-        };
-        width = source.body.width;
-        height = source.body.height;
-        collideWorldBounds = source.body.collideWorldBounds;
-        level = source.body.level;
-        callback = source.body.collisionCallback.tile;
-      } else {
-        position = {
-          x: source.x,
-          y: source.y
-        };
-        width = source.width ? source.width : 1;
-        height = source.height ? source.height : 1;
-        collideWorldBounds = source.hasOwnProperty("collideWorldBounds") ? source.collideWorldBounds : false;
-        returnTile = true;
-        level = source.level ? source.level : 0;
-        callback = source.collisionCallback ? source.body.collisionCallback.tile : null;
+  function GridPhysics(scene, pluginManager) {
+    _classCallCheck(this, GridPhysics);
+
+    var _this = _possibleConstructorReturn(this, (GridPhysics.__proto__ || Object.getPrototypeOf(GridPhysics)).call(this, scene, pluginManager));
+
+    var config = scene.registry.parent.config.physics.grid;
+    if (scene.registry.parent.config.physics.grid) {
+      var gridSize = config.gridSize;
+      if (!gridSize) {
+        gridSize = { x: 8, y: 8 };
       }
-      // Prevent going outside the tilemap?
-
-      if (collideWorldBounds && (position.x + dx < 0 || position.y + dy < 0 || position.x + dx + width > this.world.tilemaplayers[0].width / this.world.gridSize.x || position.y + dy + height > this.world.tilemaplayers[0].height / this.world.gridSize.y)) {
-        return true;
+      if (typeof gridSize === "number") {
+        gridSize = { x: gridSize, y: gridSize };
+      } else if (!gridSize.hasOwnProperty("x") || !gridSize.hasOwnProperty("y")) {
+        gridSize = { x: 8, y: 8 };
       }
-      // Update the position to the attempted movement
-      position.x += dx;
-      position.y += dy;
-
-      // Slim the body to prevent unnecessary collision checks (not that the physics are particulary demanding but anyway)
-      if (dx !== 0) {
-        if (dx > 0) {
-          position.x += width - 1;
-        }
-        width = 1;
-      } else if (dy !== 0) {
-        if (dy > 0) {
-          position.y += height - 1;
-        }
-        height = 1;
-      }
-
-      for (var x = position.x; x < position.x + width; x++) {
-        for (var y = position.y; y < position.y + height; y++) {
-          var collide = false;
-          var _iteratorNormalCompletion = true;
-          var _didIteratorError = false;
-          var _iteratorError = undefined;
-
-          try {
-            for (var _iterator = this.world.tilemaplayers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-              var layer = _step.value;
-
-              if (level > layer.level) {
-                continue;
-              }
-
-              //let tile = this.world.map.getTileAt(Math.floor(x * this.world.gridSize.x / layer.collisionWidth), Math.floor(y * this.world.gridSize.y / layer.collisionHeight), layer, true);
-              var collisionHeight = layer.layer.baseTileHeight;
-              var collisionWidth = layer.layer.baseTileHeight;
-
-              //layer.collisionWidth = 16;
-              //let tile = this.world.getTileAt(Math.floor(x * this.world.gridSize.x / layer.collisionWidth), Math.floor(y * this.world.gridSize.y / layer.collisionHeight), layer, true);
-              //debugger;
-
-              var checkY = Math.floor(y * this.world.gridSize.y / collisionHeight);
-              var checkX = void 0;
-              if (checkY < 0 || checkY > layer.layer.data.length - 1) {
-                if (this.collideWorldBounds) {
-                  return true;
-                } else {
-                  continue;
-                }
-              } else {
-                checkX = Math.floor(x * this.world.gridSize.x / collisionWidth);
-                if (checkX < 0 || checkY > layer.layer.data[checkY].length - 1) {
-                  if (this.collideWorldBounds) {
-                    return true;
-                  } else {
-                    continue;
-                  }
-                }
-              }
-
-              var tile = layer.layer.data[checkY][checkX] || null;
-
-              if (tile && tile.index === -1 && layer.level > 0 && level > 0) {
-                // HACK
-                console.log(layer.level);
-                return true;
-              }
-
-              if (returnTile) {
-                console.log(tile, checkX, checkY);
-              }
-
-              if (tile === null || tile.index === -1 && !tile.gotBorder) {
-                // No tile, or empty - OK
-                continue;
-              }
-
-              var tileCollider = callback ? callback(tile) : tile;
-
-              if (tileCollider.collideRight && tileCollider.collideLeft && tileCollider.collideDown && tileCollider.collideUp) {
-                // tile collides whatever direction the body enter
-                collide = true;
-                break;
-              } else if (dx < 0 && tileCollider.collideRight) {
-                // moving left and the tile collides from the right
-                //console.log("Collide RIGHT", tile)
-                collide = true;
-                break;
-              } else if (dx > 0 && tileCollider.collideLeft) {
-                //console.log("Collide KEFT", tile)
-                collide = true;
-                break;
-              }
-              if (dy < 0 && tileCollider.collideDown) {
-                //console.log("Collide DOWN", tile)
-                collide = true;
-                break;
-              } else if (dy > 0 && tileCollider.collideUp) {
-                //console.log("Collide UP", tile)
-                collide = true;
-                break;
-              }
-
-              // Prevents bodies to walk with path of body outside of blocked tile side
-              /* if (dx != 0) {
-                             if (tile.borderUp && position.y < tile.y * tileRatio.y) {
-                                 collide = true;
-                                 break;
-                             } else if (tile.borderDown && position.y + height > tile.y * tileRatio.y) {
-                                 collide = true;
-                                 break;
-                             }
-                         }
-                         if (dy != 0) {
-                             if (tile.borderLeft && position.x < tile.x * tileRatio.x) {
-                                 collide = true;
-                                 break;
-                             } else if (tile.borderRight && position.x + width > tile.x * tileRatio.x) {
-                                 collide = true;
-                                 break;
-                             }
-                         }*/
-            }
-          } catch (err) {
-            _didIteratorError = true;
-            _iteratorError = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion && _iterator.return) {
-                _iterator.return();
-              }
-            } finally {
-              if (_didIteratorError) {
-                throw _iteratorError;
-              }
-            }
-          }
-
-          if (collide) {
-            if (slide) {
-              // Left-over from previous working version, needs review...
-              if (dx !== 0) {
-                if (!this.collide(source, dx, dy - 1)) {
-                  return {
-                    dx: dx,
-                    dy: dy - 1
-                  };
-                } else if (!this.collide(source, dx, dy + 1)) {
-                  return {
-                    dx: dx,
-                    dy: dy + 1
-                  };
-                }
-              }
-              if (dy !== 0) {
-                if (!this.collide(source, dx - 1, dy)) {
-                  return {
-                    dx: dx - 1,
-                    dy: dy
-                  };
-                } else if (!this.collide(source, dx + 1, dy)) {
-                  return {
-                    dx: dx + 1,
-                    dy: dy
-                  };
-                }
-              }
-            }
-            return {
-              dx: 0,
-              dy: 0
-            };
-          }
-        }
-      }
-      return false;
-    }
-  }, {
-    key: "getTilesUnderBody",
-    value: function getTilesUnderBody(body) {
-      console.log("Check", body.gridPosition.x, body.gridPosition.y, body.width, body.height);
-
-      return this.getTilesAt(body.gridPosition.x, body.gridPosition.y, body.width, body.height);
-    }
-  }, {
-    key: "getTilesAt",
-    value: function getTilesAt(x, y, width, height) {
-      var tileScaleX = 2;
-      var tileScaleY = 2;
-      var tiles = [];
-
-      var startX = Math.floor(x / tileScaleX);
-      startX = startX < 0 ? 0 : startX;
-
-      var startY = Math.floor(y / tileScaleY);
-      startY = startY < 0 ? 0 : startY;
-
-      var stopX = Math.floor((x + width) / tileScaleX);
-      stopX = stopX > this.world.tilemaplayers[0].tilemap.width ? this.world.tilemaplayers[0].tilemap.width : stopX;
-
-      var stopY = Math.floor(y + height) / tileScaleY;
-      stopY = stopY > this.world.tilemaplayers[0].tilemap.height ? this.world.tilemaplayers[0].tilemap.height : stopY;
-
-      console.log("scan x=" + startX + " to " + stopX + " amd y=" + startY + " to " + stopY);
-
-      this.world.tilemaplayers.forEach(function (layer, layerIndex) {
-        tiles[layerIndex] = [];
-
-        for (var checkX = startX; checkX < stopX; checkX += tileScaleX) {
-          for (var checkY = startY; checkY < stopY; checkY += tileScaleY) {
-            var tile = layer.layer.data[checkY][checkX] || null;
-            if (tile) {
-              tiles[layerIndex].push(tile);
-            }
-          }
-        }
-      });
-      return tiles;
-    }
-  }, {
-    key: "checkLevel",
-    value: function checkLevel(source, dx, dy) {
-      var position = void 0,
-          width = void 0,
-          height = void 0;
-      var level = 0;
-
-      // DRY FAIL: Slightly modified copy from collision
-      if (source.hasOwnProperty("body")) {
-        position = {
-          x: source.body.gridPosition.x,
-          y: source.body.gridPosition.y
-        };
-        width = source.body.width;
-        height = source.body.height;
-      } else {
-        position = {
-          x: source.x,
-          y: source.y
-        };
-        width = source.width ? source.width : 1;
-        height = source.height ? source.height : 1;
-      }
-
-      position.x += dx;
-      position.y += dy;
-
-      if (dx !== 0) {
-        width = 1;
-      } else {
-        height = 1;
-      }
-
-      if (dx > 0) {
-        position.x = position.x + width;
-      } else if (dy > 0) {
-        position.y = position.y + height;
-      }
-
-      // Return level a sprite move to, higher level is prioritized
-      for (var x = position.x; x < position.x + width; x++) {
-        for (var y = position.y; y < position.y + height; y++) {
-          var _iteratorNormalCompletion2 = true;
-          var _didIteratorError2 = false;
-          var _iteratorError2 = undefined;
-
-          try {
-            for (var _iterator2 = this.world.tilemaplayers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-              var layer = _step2.value;
-
-              var tile = layer.layer.data[Math.floor(y / 2)][Math.floor(x / 2)];
-
-              console.log(layer, layer.level, x, y, tile);
-
-              if (tile && tile.index > 0 && layer.level > level) {
-                level = layer.level;
-              }
-            }
-          } catch (err) {
-            _didIteratorError2 = true;
-            _iteratorError2 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                _iterator2.return();
-              }
-            } finally {
-              if (_didIteratorError2) {
-                throw _iteratorError2;
-              }
-            }
-          }
-        }
-      }
-      console.log("LEVEL", level);
-      return level;
-    }
-  }]);
-
-  return Tilemap;
-}();
-
-exports.default = Tilemap;
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var GridBody = function () {
-  function GridBody(sprite) {
-    _classCallCheck(this, GridBody);
-
-    /**
-     * @property {Phaser.Sprite} sprite - Reference to the parent Sprite.
-     */
-    this.sprite = sprite;
-
-    /**
-     * @property {Phaser.Game} world - Local reference to the grid physics world.
-     */
-    this.world = Phaser.Physics.GridPhysics.world;
-
-    this.tilemap = Phaser.Physics.GridPhysics.tilemap;
-
-    this.solid = true;
-
-    // UNDECIDED:
-    /**
-     * @property {boolean} enable - A disabled body won't be checked for any form of collision or overlap or have its pre/post updates run.
-     * @default
-     */
-    //this.enable = true;
-
-    // TODO:
-    /**
-     * @property {Phaser.Point} offset - The offset of the Physics Body from the Sprite x/y this.gridPosition.
-     */
-    //  this.offset = new Phaser.Point();
-
-    /**
-     * @property {Phaser.Point} position - The position of the physics body.
-     * @readonly
-     */
-    this.gridPosition = new Phaser.Geom.Point(0, 0);
-
-    this.zIndex = 0;
-    this.zHeight = 1;
-
-    /**
-     * @property {number} width - The calculated width of the physics body in grid units. Default match sprite size.
-     * @readonly
-     */
-    this.width = Math.round(sprite.width / this.world.gridSize.x);
-
-    /**
-     * @property {number} height - The calculated height of the physics body in grid units. Default match sprite size.
-     * @readonly
-     */
-    this.height = Math.round(sprite.height / this.world.gridSize.y);
-
-    /**
-     * @property {Phaser.Point} velocity - The velocity, or rate of change in speed of the Body. Measured in pixels per second.
-     */
-    this.velocity = new Phaser.Geom.Point(0, 0);
-
-    /**
-     * @property {Phaser.Point} _desiredVelocity - Velocity the entity strives to get.
-     * @readonly
-     */
-    this._desiredVelocity = new Phaser.Geom.Point(0, 0);
-
-    // TODO:
-    /**
-     * @property {Phaser.Point} _forcedVelocity - Velocity the entity is being pushed or otherwise forced.
-     * @readonly
-     */
-    //this._forcedVelocity = new Phaser.Point();
-
-    // TODO:
-    /**
-     * A Signal that is dispatched when this Body collides with another Body.
-     */
-    //this.onCollide = null;
-
-    /**
-     * @property {number} mass - The mass of the body. A body with strength => this.mass will be able to push this body.
-     * @default
-     */
-    this.mass = 1;
-
-    /**
-     * @property {number} strength - Total mass that this body can move. -1 = unlimited
-     * @default
-     */
-    this.strength = -1;
-
-    /**
-     * @property {number} pushLimit - Max number of objects that can be pushed, -1 = unlimited
-     * @default
-     */
-    this.pushLimit = -1;
-
-    /**
-     * @property {number} struggle - Speed decrese ( velocity /= struggle * pushed mass), 0 = no decrese
-     * NOTE: This will probably change to allow more flexible calculations (strugglePower = struggle.c + struggle.k * mass).
-     * @default
-     */
-    this.struggle = 0;
-
-    /**
-     * @property {boolean} struggling - If the object is trying to move but not able, it will struggle :-)
-     * @readonly
-     */
-    this.struggling = false;
-
-    /**
-     * @property {number} facing - A const reference to the direction the Body is traveling or facing.
-     * @default
-     */
-    this.facing = Phaser.NONE;
-
-    /**
-     * @property {boolean} immovable - An immovable Body will not receive any impacts from other bodies.
-     * @default
-     */
-    this.immovable = false;
-
-    /**
-     * @property {boolean} collidable - The body will check collision only if collidible is set to true.
-     * @default
-     */
-    this.collidable = true;
-
-    /**
-     * A Body can be set to collide against the World bounds automatically and rebound back into the World if this is set to true. Otherwise it will leave the World.
-     * @property {boolean} collideWorldBounds - Should the Body collide with the World bounds?
-     */
-    this.collideWorldBounds = false;
-
-    /**
-     * @property {object} isMoving - Is populated with information if the body is actually moving.
-     * @readonly
-     */
-    this.isMoving = {
-      x: false,
-      y: false,
-      any: false
-    };
-
-    this.level = 0;
-
-    // MAYBE:
-    /**
-     * @property {Phaser.Signal} onMoveComplete - Listen for the completion of `moveTo` or `moveFrom` events.
-     */
-    //this.onMoveComplete = new Phaser.Signal();
-
-    this.moveTo = {
-      active: false,
-      path: [],
-      next: null,
-      recalc: 0 // 0 - never, 1 - if collision, 2 - each step (not impleneted yet)
-    };
-
-    this.magnetism = {
-      dragItself: false, // If the body's weight is less than the object it's trying to pull and it's movable=true it will be pulled to the object instead of the opposite
-      weakenByFactor: 1, //A power of 10 with weakenByFactor of 0.5 will have a power of 10*0.5 = 5 on one gridunit distance, and 10*0.5*0.5 = 2.5 on two.
-      maxRange: 1, // Stop magnetism after this amount of squares regardless of power or weakenByFactor
-      top: {
-        active: false,
-        power: 0, // 0 = Infinited, If dragged this magnetism could pull this mass without break seal.
-        pole: null, // any pole-id (could be NORTH/SOUTH), null == any
-        attractedTo: null, // any pole-id of other body
-        attractedToAll: false // Like a black hole.
-      },
-      right: {
-        active: false,
-        power: 0,
-        pole: null,
-        attractedTo: null,
-        attractedToAll: false
-      },
-      bottom: {
-        active: false,
-        power: 0,
-        pole: null,
-        attractedTo: null,
-        attractedToAll: false
-      },
-      left: {
-        active: false,
-        power: 0,
-        pole: null,
-        attractedTo: null,
-        attractedToAll: false
-      }
-    };
-
-    this.cojoinedBodies = []; // Array of bodies
-
-    this.collidingBodies = []; // [{active: Body, passive: Body}]
-    this.collectCollidingBodies = true;
-
-    /**
-     * @property {Phaser.Point} shadow - The shadow reserves tiles this object moves from while animating a move to prevent overlaps from other sprites.
-     * NOTE: Not yet entirely implemented
-     * @readonly
-     */
-    this._shadow = new Phaser.Geom.Point(0, 0);
-
-    /**
-     * @property {object} isLocked - Used to prevent body from doing new moves before the last is finished.
-     * NOTE: Not yet entirely implemented: May allow to turn in same direction and other stuff to make responsive.
-     * @readonly
-     */
-    this.isLocked = {
-      x: false,
-      y: false,
-      any: false
-    };
-
-    // MAY BE REMOVED:
-    this._longPress = 0; // 0 - X, 1-Y (längsta nedtryckt)
-
-    /**
-     * @property {Number} activeSteps - Number of steps the body has taken.
-     * NOTE: Not yet entirely implemented
-     * @readonly
-     */
-    this.activeSteps = 0;
-
-    /**
-     * @property {Number} passiveSteps - Number of steps the body has been forced to take (being pushed).
-     * NOTE: Not yet entirely implemented
-     * @readonly
-     */
-    this.passiveSteps = 0;
-
-    /**
-     *  Callbacks can override collisions. This is just for blocking behaviour. Set collectCollidingBodies to populate colliding bodies and getTilesUnderBody() to get all tiles a body i positioned over.
-     *  @property {Function} tile - Takes a tile and return new collision up, right, down and left values.
-     *  @property {Function} body - Takes a two bodies and return boolean weather the first should be considered solid
-     */
-    this.collisionCallback = {
-      tile: null,
-      body: null
-    };
-
-    this.myTurn = false;
-    this.turns = 0;
-    this.reload = 1;
-
-    this.onStairs = false;
-
-    this.sprite.setOrigin(0, 0);
-
-    this.snapToGrid();
-  }
-
-  _createClass(GridBody, [{
-    key: "snapToGrid",
-    value: function snapToGrid() {
-      this.gridPosition = {
-        x: Math.round(this.sprite.x / this.world.gridSize.x),
-        y: Math.round(this.sprite.y / this.world.gridSize.y)
-      };
-      this.sprite.x = this.world.gridSize.x * this.gridPosition.x;
-      this.sprite.y = this.world.gridSize.y * this.gridPosition.y;
-    }
-  }, {
-    key: "setPosition",
-    value: function setPosition() {
-      var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
-      this.gridPosition.x = x;
-      this.gridPosition.y = y;
-      this.sprite.x = this.world.gridSize.x * this.gridPosition.x;
-      this.sprite.y = this.world.gridSize.y * this.gridPosition.y;
-      this.isLocked.x = false;
-      this.isLocked.y = false;
-    }
-  }, {
-    key: "setVelocity",
-    value: function setVelocity(x) {
-      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      // longpress is not yet implemented
-      y = y !== null ? y : x;
-
-      if (x === 0 && y !== 0) {
-        this._longpress = 1;
-      } else if (y === 0 && x !== 0) {
-        this._longpress = 0;
-      }
-      this._desiredVelocity = {
-        x: x,
-        y: y
+      config = {
+        debug: config.debug ? true : false,
+        gridSize: gridSize
       };
     }
-  }, {
-    key: "_intersectRect",
-    value: function _intersectRect(r1, r2) {
-      return !(r2.x >= r1.x + r1.width || r2.x + r2.width <= r1.x || r2.y >= r1.y + r1.height || r2.y + r2.height <= r1.y);
+
+    Phaser.Physics.GridPhysics = _this;
+    //  The Scene that owns this plugin
+    //this.scene = scene;
+    _this.world = new _world2.default(scene, config);
+    _this.tilemap = new _tilemap2.default();
+    scene.gridPhysics = _this;
+    //this.systems = scene.sys;
+
+    if (!scene.sys.settings.isBooted) {
+      scene.sys.events.once("boot", _this.boot, _this);
     }
-  }, {
-    key: "getTilesUnderBody",
-    value: function getTilesUnderBody() {
-      console.log("check", this);
-      return this.tilemap.getTilesUnderBody(this);
-    }
-  }, {
-    key: "testMove",
-    value: function testMove(dx, dy) {
-      var freeToGo = true;
+    return _this;
+  }
 
-      if (!this.collidable) {
-        return true;
-      }
+  //  Called when the Plugin is booted by the PluginManager.
+  //  If you need to reference other systems in the Scene (like the Loader or DisplayList) then set-up those references now, not in the constructor.
 
-      if (this.onStairs) {
-        this.level = this.tilemap.checkLevel(this.sprite, dx, dy);
-      }
 
-      if (this.tilemap.collide(this.sprite, dx, dy) && this.solid) {
-        return false;
-      }
-
-      if (!this.collectCollidingBodies && !freeToGo) {
-        return false;
-      }
-
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = this.world.bodies[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var body = _step.value;
-
-          if (this === body || !body.sprite.active) {
-            continue;
-          }
-
-          if (body.collidable && (body.level === this.level || body.onStairs)) {
-            // If not able to move and neither body is collecting colliding bodies, skip further checks
-            if (!freeToGo && !this.collectCollidingBodies && !body.collectCollidingBodies) {
-              continue;
-            }
-
-            if (this._intersectRect({
-              x: this.gridPosition.x + dx,
-              y: this.gridPosition.y + dy,
-              width: this.width,
-              height: this.height
-            }, {
-              x: body.gridPosition.x,
-              y: body.gridPosition.y,
-              width: body.width,
-              height: body.height
-            })) {
-              // Collect bodies if needed
-              if (this.collectCollidingBodies && this.collidingBodies.indexOf(body) === -1) {
-                this.collidingBodies.push(body);
-              }
-              if (body.collectCollidingBodies && body.collidingBodies.indexOf(this) === -1) {
-                body.collidingBodies.push(this);
-              }
-              // Collision callback
-              var bodyIsSolid = this.collisionCallback.body ? this.collisionCallback.body(body, this) : body.solid;
-
-              // Check how the other body might affect this one
-              if (!this.solid || !bodyIsSolid) {
-                continue;
-              }
-
-              if (body.immovable) {
-                freeToGo = false;
-              } else {
-                if (this.world._pushChain.indexOf(body) === -1) {
-                  this.world._pushChain.push(body); // Tryck på denna
-                  if (!body.testMove(dx, dy)) {
-                    // kolla upp kroppen
-                    freeToGo = false;
-                  }
-                }
-              }
-            }
-          }
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-
-      return freeToGo;
+  _createClass(GridPhysics, [{
+    key: "boot",
+    value: function boot() {
+      var eventEmitter = this.systems.events;
+      eventEmitter.on("update", this.update, this);
+      eventEmitter.on("postupdate", this.postUpdate, this);
+      eventEmitter.on("shutdown", this.shutdown, this);
+      eventEmitter.on("destroy", this.destroy, this);
     }
   }, {
     key: "postUpdate",
-    value: function postUpdate() {
-      this.collidingBodies = [];
-      this.justMoved = false;
-      if (this.isLocked.x || this.isLocked.y) {
-        return;
-      }
-
-      if (this.moveTo.active) {
-        this._desiredVelocity = {
-          x: 0,
-          y: 0
-        };
-        var dest = this.moveTo.path[this.moveTo.next];
-        if (dest.x < this.gridPosition.x) {
-          this._desiredVelocity.x = -100;
-        } else if (dest.x > this.gridPosition.x) {
-          this._desiredVelocity.x = 100;
-        } else if (dest.y < this.gridPosition.y) {
-          this._desiredVelocity.y = -100;
-        } else if (dest.y > this.gridPosition.y) {
-          this._desiredVelocity.y = 100;
-        }
-        this.moveTo.next++;
-        if (this.moveTo.next > this.moveTo.path.length - 1) {
-          this.moveTo.active = false;
-        }
-      }
-
-      this.isMoving = {
-        x: false,
-        y: false,
-        any: false
-      };
-
-      if (this._desiredVelocity.x === 0 && this._desiredVelocity.y === 0) {
-        this.velocity.x = 0;
-        this.velocity.y = 0;
-        this.struggling = false;
-        return;
-      }
-
-      this.world._pushChain = [];
-      var moveOk = true;
-      var _d = {};
-      var _arr = ["x", "y"];
-      for (var _i = 0; _i < _arr.length; _i++) {
-        var dim = _arr[_i];
-        _d[dim] = this._desiredVelocity[dim] === 0 ? 0 : this._desiredVelocity[dim] > 0 ? 1 : -1;
-      }
-
-      var _arr2 = [0, 1];
-      for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-        var _dim = _arr2[_i2];
-        // Array här ändrar ordning efter prio
-        if (_dim === 0) {
-          if (_d.x === 0) {
-            continue;
-          }
-          if (!this.testMove(_d.x, 0)) {
-            moveOk = false;
-            break;
-          } else {
-            moveOk = true;
-          }
-        } else {
-          if (_d.y === 0) {
-            continue;
-          }
-          if (!this.testMove(0, _d.y)) {
-            moveOk = false;
-            break;
-          } else {
-            moveOk = true;
-          }
-        }
-      }
-
-      // Check if strong enough
-      if (this.strength > -1 || this.struggle > 1) {
-        var totalMass = 0;
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
-
-        try {
-          for (var _iterator2 = this.world._pushChain[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var body = _step2.value;
-
-            totalMass += body.mass;
-          }
-        } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-              _iterator2.return();
-            }
-          } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
-            }
-          }
-        }
-
-        if (this.strength > -1 && totalMass > this.strength) {
-          moveOk = false;
-        }
-        if (this.struggle > 1 && totalMass > 0) {
-          this._desiredVelocity.x = this._desiredVelocity.x / (totalMass * this.struggle);
-          this._desiredVelocity.y = this._desiredVelocity.y / (totalMass * this.struggle);
-        }
-      }
-      if (this.pushLimit > -1 && this.world._pushChain.length > this.pushLimit) {
-        moveOk = false;
-      }
-
-      if (!moveOk) {
-        if (this._desiredVelocity.x !== 0 || this._desiredVelocity.y !== 0) {
-          this.struggling = true;
-        }
-        if (this._desiredVelocity.x > 0) {
-          this.facing = Phaser.RIGHT;
-        } else if (this._desiredVelocity.x < 0) {
-          this.facing = Phaser.LEFT;
-        } else if (this._desiredVelocity.y < 0) {
-          this.facing = Phaser.UP;
-        } else if (this._desiredVelocity.y > 0) {
-          this.facing = Phaser.DOWN;
-        }
-        this.velocity.x = 0;
-        this.velocity.y = 0;
-        this._shadow.x = 0;
-        this._shadow.y = 0;
-
-        return;
-      }
-
-      var _arr3 = ["x", "y"];
-      for (var _i3 = 0; _i3 < _arr3.length; _i3++) {
-        var _dim2 = _arr3[_i3];
-        this.velocity[_dim2] = this._desiredVelocity[_dim2];
-        this._shadow[_dim2] = 0;
-        if (this.velocity[_dim2] != 0) {
-          this.gridPosition[_dim2] += this.velocity[_dim2] > 0 ? 1 : -1;
-          this.isLocked[_dim2] = true;
-          this._shadow[_dim2] = this.velocity[_dim2] < 0 ? 1 : -1;
-
-          var _iteratorNormalCompletion3 = true;
-          var _didIteratorError3 = false;
-          var _iteratorError3 = undefined;
-
-          try {
-            for (var _iterator3 = this.world._pushChain[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-              var _body = _step3.value;
-
-              _body.passiveSteps++;
-              _body.snapToGrid();
-              _body.velocity[_dim2] = this._desiredVelocity[_dim2];
-              _body.gridPosition[_dim2] += _body.velocity[_dim2] > 0 ? 1 : -1;
-              _body.isLocked[_dim2] = true;
-              _body.onStairs = this.checkStairs(_body);
-            }
-          } catch (err) {
-            _didIteratorError3 = true;
-            _iteratorError3 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                _iterator3.return();
-              }
-            } finally {
-              if (_didIteratorError3) {
-                throw _iteratorError3;
-              }
-            }
-          }
-        }
-      }
-
-      if (this.velocity.x > 0) {
-        this.facing = Phaser.RIGHT;
-      } else if (this.velocity.x < 0) {
-        this.facing = Phaser.LEFT;
-      } else if (this.velocity.y < 0) {
-        this.facing = Phaser.UP;
-      } else if (this.velocity.y > 0) {
-        this.facing = Phaser.DOWN;
-      }
-
-      if (this.velocity.x !== 0) {
-        this.isMoving.x = true;
-      }
-      if (this.velocity.y !== 0) {
-        this.isMoving.y = true;
-      }
-      this.isMoving.any = true;
-      this.struggling = false;
-
-      this.baseVelocity = 75;
-      this.activeSteps++;
-      this.justMoved = true;
-
-      var wasOnStairs = this.onStairs;
-
-      this.onStairs = this.checkStairs(this);
-
-      if (wasOnStairs && !this.onStairs) {
-        // HACK
-        if (this.level === 1) {
-          this.sprite.setDepth(11);
-        } else {
-          this.sprite.setDepth(1);
-        }
-      }
+    value: function postUpdate(time, delta) {
+      this.world.bodies.forEach(function (body) {
+        body.sprite.active ? body.postUpdate() : null;
+      });
     }
   }, {
-    key: "checkStairs",
-    value: function checkStairs(body) {
-      var pos = body.gridPosition;
-      var _iteratorNormalCompletion4 = true;
-      var _didIteratorError4 = false;
-      var _iteratorError4 = undefined;
-
-      try {
-        for (var _iterator4 = this.world.stairs[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-          var stairs = _step4.value;
-
-          if (pos.x < stairs.x + stairs.width && pos.x + body.width > stairs.x && pos.y < stairs.y + stairs.height && body.height + pos.y > stairs.y) {
-            body.sprite.setDepth(1000);
-            return true;
-          }
-        }
-      } catch (err) {
-        _didIteratorError4 = true;
-        _iteratorError4 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion4 && _iterator4.return) {
-            _iterator4.return();
-          }
-        } finally {
-          if (_didIteratorError4) {
-            throw _iteratorError4;
-          }
-        }
-      }
-
-      return false;
+    key: "update",
+    value: function update(time, delta) {
+      this.world.update(time, delta);
     }
-
-    /**
-     * Draws this Body's boundary and velocity, if enabled.
-     *
-     * @method Phaser.Physics.Arcade.Body#drawDebug
-     * @since 3.0.0
-     *
-     * @param {Phaser.GameObjects.Graphics} graphic - The Graphics object to draw on.
-     */
+    //  Called when a Scene shuts down, it may then come back again later (which will invoke the 'start' event) but should be considered dormant.
 
   }, {
-    key: "drawDebug",
-    value: function drawDebug(graphic) {
-      var x = this.gridPosition.x * this.world.gridSize.x;
-      var y = this.gridPosition.y * this.world.gridSize.y;
-      var w = this.width * this.world.gridSize.x;
-      var h = this.height * this.world.gridSize.y;
+    key: "shutdown",
+    value: function shutdown() {}
 
-      if (true) {
-        graphic.lineStyle(1, "0xFFFFFF"); //this.debugBodyColor
-        if (!this.sprite.active) {
-          graphic.lineStyle(1, "0xFF0000"); //this.debugBodyColor
-        }
-        graphic.strokeRect(x, y, w, h);
-      }
-      /*if (this.debugShowVelocity)
-          {
-              graphic.lineStyle(1, this.world.defaults.velocityDebugColor, 1);
-              graphic.lineBetween(x, y, x + this.velocity.x / 2, y + this.velocity.y / 2);
-          }*/
+    //  Called when a Scene is destroyed by the Scene Manager. There is no coming back from a destroyed Scene, so clear up all resources here.
+
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      this.shutdown();
+      this.scene = undefined;
     }
-
-    /*renderDebugBody() {
-           if (!this.debugBody) {
-               this.debugBody = new Phaser.Rectangle(sprite.x, sprite.y, sprite.width, sprite.height);
-               this.debugShadow = new Phaser.Rectangle(sprite.x, sprite.y, sprite.width, sprite.height);
-           }
-             this.debugBody.x = this.gridPosition.x * this.world.gridSize.x;
-           this.debugBody.y = this.gridPosition.y * this.world.gridSize.y;
-           this.debugShadow.x = this.gridPosition.x * this.world.gridSize.x + this.world.gridSize.x * this._shadow.x;
-           this.debugShadow.y = this.gridPosition.y * this.world.gridSize.y + this.world.gridSize.y * this._shadow.y;
-           if (this._shadow.x == 0) {
-               this.debugShadow.width = this.sprite.width;
-               this.debugShadow.height = this.world.gridSize.y;
-           } else {
-               this.debugShadow.width = this.world.gridSize.x;
-               this.debugShadow.height = this.sprite.height;
-             }
-           game.debug.geom(this.debugBody, 'rgba(0,255,0,0.4)');
-       }*/
-
-    /*renderBodyInfo(debug, body) {
-           debug.line('x: ' + body.gridPosition.x, 'y: ' + body.gridPosition.y, 'width: ' + body.width, 'height: ' + body.height);
-           /*debug.line('x: ' + body.x.toFixed(2), 'y: ' + body.y.toFixed(2), 'width: ' + body.width, 'height: ' + body.height);
-           debug.line('velocity x: ' + body.velocity.x.toFixed(2), 'y: ' + body.velocity.y.toFixed(2), 'deltaX: ' + body._dx.toFixed(2), 'deltaY: ' + body._dy.toFixed(2));
-           debug.line('acceleration x: ' + body.acceleration.x.toFixed(2), 'y: ' + body.acceleration.y.toFixed(2), 'speed: ' + body.speed.toFixed(2), 'angle: ' + body.angle.toFixed(2));
-           debug.line('gravity x: ' + body.gravity.x, 'y: ' + body.gravity.y, 'bounce x: ' + body.bounce.x.toFixed(2), 'y: ' + body.bounce.y.toFixed(2));
-           debug.line('touching left: ' + body.touching.left, 'right: ' + body.touching.right, 'up: ' + body.touching.up, 'down: ' + body.touching.down);
-           debug.line('blocked left: ' + body.blocked.left, 'right: ' + body.blocked.right, 'up: ' + body.blocked.up, 'down: ' + body.blocked.down);* /
-     }
-    */
-
-    /* moveToPixelXY(x, y, speed = 60, maxTime = 0, active = true) {
-            x = Math.round(x / this.world.gridSize.x);
-            y = Math.round(y / this.world.gridSize.y);
-            this.moveToXY(x, y, speed, maxTime, active);
-        }*/
-
-    /* moveToXY(x, y, speed = 60, maxTime = 0, active = true) {
-            /*
-              Yes, I know that this is ridiculously inefficient rebuilding the grid from the tilemap
-              on each call without any cache, and trying to find the path of the full current map
-              even if it's not necessarily in most cases.
-                It's also still buggy. Different bodysizes and stuff is a challenge, and now
-              the body size is locked to 2x2 of the grid size.
-                And, also it just checks the first tilemap layer for collision even if you added more.
-              * /
-    
-            if (typeof(EasyStar) === 'undefined') {
-                console.error("Grid Physics error: Easystar.js must be enabled!");
-                return;
-            }
-            if (this.physics.render.path || this.physics.render.pathCollision) {
-                this.physics.resetDebugRenderer();
-            }
-              let easystar = new EasyStar.js();
-              // Generate array
-            // Respond
-            let grid = [];
-            let i = 0;
-            let tileRatio = {
-                x: this.physics.tilemaplayers[0].layer.data[0][0].width / game.physics.gridPhysics.gridSize.x,
-                y: this.physics.tilemaplayers[0].layer.data[0][0].height / game.physics.gridPhysics.gridSize.y
-            };
-            for (let row of this.physics.tilemaplayers[0].layer.data) {
-                grid[i] = [];
-                grid[i + 1] = [];
-                for (let tile of row) {
-                    if (tile.collideUp && tile.collideDown && tile.collideLeft && tile.collideRight) { // ¦¦ --> && när conditional
-                        for (let dy = 0; dy < tileRatio.y; dy++) {
-                            for (let dx = 0; dx < tileRatio.x; dx++) {
-                                grid[i + dx].push(1);
-                            }
-                        }
-                    } else if (tile.collideUp || tile.collideDown || tile.collideLeft || tile.collideRight) {
-                        for (let dy = 0; dy < tileRatio.y; dy++) {
-                            for (let dx = 0; dx < tileRatio.x; dx++) {
-                                grid[i + dx].push(4);
-                            }
-                        }
-                    } else {
-                        for (let dy = 0; dy < tileRatio.y; dy++) {
-                            for (let dx = 0; dx < tileRatio.x; dx++) {
-                                grid[i + dx].push(0);
-                            }
-                        }
-                    }
-                }
-                //i++;
-                i += tileRatio.y;
-            }
-              // Bodies
-            for (let body of this.physics.bodies) {
-                if (body === this) {
-                    continue;
-                }
-                for (let x = 0; x < body.width; x++) {
-                    for (let y = 0; y < body.height; y++) {
-                        grid[body.gridPosition.y + y][body.gridPosition.x + x] = 3;
-                      }
-                }
-            }
-    
-    
-            // Smalare korridorer
-            for (let y = 0; y < grid.length; y++) {
-                  for (let x = 0; x < grid[0].length; x++) {
-                    if (x > 0 && grid[y][x] > 0 && grid[y][x] < 4) {
-                        if (grid[y][x - 1] == 0 || grid[y][x - 1] == 4) {
-                            grid[y][x - 1] = 2;
-                        }
-                        if (y > 0 && grid[y - 1][x] == 0 || grid[y][x - 1] == 4) {
-                            grid[y - 1][x] = 2;
-                        }
-                        if (x > 0 && y > 0 && grid[y - 1][x - 1] == 0 || grid[y][x - 1] == 4) {
-                            grid[y - 1][x - 1] = 2;
-                        }
-                    }
-                }
-              }
-    
-            //debugger;
-            //        console.warn(grid);
-              this.physics.renderPathCollision(grid);
-    
-              easystar.setGrid(grid);
-    
-            // Directional condition
-            for (let y = 0; y < grid.length; y++) {
-                for (let x = 0; x < grid[0].length; x++) {
-                      if (grid[y][x] === 4) {
-                        let tile = this.physics.tilemaplayers[0].layer.data[Math.round(y / 2)][Math.round(x / 2)];
-                        let paths = []; //;
-                        if (!tile.collideUp) {
-                            paths.push(EasyStar.BOTTOM);
-                        }
-                        if (!tile.collideRight) {
-                            paths.push(EasyStar.LEFT);
-                        }
-                        if (!tile.collideDown) {
-                            paths.push(EasyStar.TOP);
-                        }
-                        if (!tile.collideLeft) {
-                            paths.push(EasyStar.RIGHT);
-                        }
-                        grid[y][x] = 0;
-                        easystar.setDirectionalCondition(x, y, paths);
-                    }
-                }
-            }
-              easystar.setAcceptableTiles([0, 4]);
-              easystar.findPath(this.gridPosition.x, this.gridPosition.y, x, y, (path) => {
-                if (path === null) {
-                    //console.log("Path was not found.");
-                } else if (path.length > 0) {
-                    //    console.log("Path was found. The first Point is " + path[1].x + " " + path[1].y, this);
-                    this.moveTo = {
-                        active: true,
-                        path,
-                        next: 1,
-                        velocity: speed,
-                        recalc: 0
-                    };
-                    this.physics.renderPath(this.moveTo.path);
-                      /*this.moveTo.x =
-                    this.moveTo.y = path[1].y*2;*/
-    /*  if (x < this.gridPosition.x) {
-                       //  this.setVelocity(-speed, 0);
-                         this.moveTo.x = -1;
-                     }
-                     else if (x > this.gridPosition.x) {
-                       //  this.setVelocity(speed, 0);
-                         this.moveTo.x = 1;
-                     }
-                     else if (y < this.gridPosition.y) {
-                       //  this.setVelocity(0, -speed);
-                         this.moveTo.y = -1;
-                     } else if (y > this.gridPosition.y) {
-                       //  this.setVelocity(0, speed);
-                         this.moveTo.y = 1;
-                     }* /
-               }
-           });
-           easystar.setIterationsPerCalculation(1000);
-           easystar.calculate();
-             // This.isMovingToXY = {active: true, x,y,speed) <-- Kör på automatiskt medan detta finns. Testa ny väg vid varje stopp
-       }*/
-
   }]);
 
-  return GridBody;
-}();
+  return GridPhysics;
+}(Phaser.Plugins.ScenePlugin);
 
-exports.default = GridBody;
+//  Static function called by the PluginFile Loader.
+
+
+GridPhysics.register = function (PluginManager) {
+  //  Register this plugin with the PluginManager, so it can be added to Scenes.
+  PluginManager.register("GridPhysics", GridPhysics, "GridPhysics");
+};
+
+module.exports = GridPhysics;
 
 /***/ }),
-/* 2 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1355,7 +235,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _gridBody = __webpack_require__(1);
+var _gridBody = __webpack_require__(2);
 
 var _gridBody2 = _interopRequireDefault(_gridBody);
 
@@ -1960,130 +840,1270 @@ var World = function () {
 exports.default = World;
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var GridBody = function () {
+  function GridBody(sprite) {
+    _classCallCheck(this, GridBody);
+
+    /**
+     * @property {Phaser.Sprite} sprite - Reference to the parent Sprite.
+     */
+    this.sprite = sprite;
+
+    /**
+     * @property {Phaser.Game} world - Local reference to the grid physics world.
+     */
+    this.world = Phaser.Physics.GridPhysics.world;
+
+    this.tilemap = Phaser.Physics.GridPhysics.tilemap;
+
+    this.solid = true;
+
+    // UNDECIDED:
+    /**
+     * @property {boolean} enable - A disabled body won't be checked for any form of collision or overlap or have its pre/post updates run.
+     * @default
+     */
+    //this.enable = true;
+
+    // TODO:
+    /**
+     * @property {Phaser.Geom.Point} offset - The offset of the Physics Body from the Sprite x/y this.gridPosition.
+     */
+    this.offset = new Phaser.Geom.Point(0, 0);
+
+    /**
+     * @property {Phaser.Geom.Point} position - The position of the physics body.
+     * @readonly
+     */
+    this.gridPosition = new Phaser.Geom.Point(0, 0);
+
+    this.zIndex = 0;
+    this.zHeight = 1;
+
+    /**
+     * @property {number} width - The calculated width of the physics body in grid units. Default match sprite size.
+     * @readonly
+     */
+    this.width = Math.round(sprite.width / this.world.gridSize.x);
+
+    /**
+     * @property {number} height - The calculated height of the physics body in grid units. Default match sprite size.
+     * @readonly
+     */
+    this.height = Math.round(sprite.height / this.world.gridSize.y);
+
+    /**
+     * @property {Phaser.Point} velocity - The velocity, or rate of change in speed of the Body. Measured in pixels per second.
+     */
+    this.velocity = new Phaser.Geom.Point(0, 0);
+
+    /**
+     * @property {Phaser.Point} _desiredVelocity - Velocity the entity strives to get.
+     * @readonly
+     */
+    this._desiredVelocity = new Phaser.Geom.Point(0, 0);
+
+    // TODO:
+    /**
+     * @property {Phaser.Point} _forcedVelocity - Velocity the entity is being pushed or otherwise forced.
+     * @readonly
+     */
+    //this._forcedVelocity = new Phaser.Point();
+
+    // TODO:
+    /**
+     * A Signal that is dispatched when this Body collides with another Body.
+     */
+    //this.onCollide = null;
+
+    /**
+     * @property {number} mass - The mass of the body. A body with strength => this.mass will be able to push this body.
+     * @default
+     */
+    this.mass = 1;
+
+    /**
+     * @property {number} strength - Total mass that this body can move. -1 = unlimited
+     * @default
+     */
+    this.strength = -1;
+
+    /**
+     * @property {number} pushLimit - Max number of objects that can be pushed, -1 = unlimited
+     * @default
+     */
+    this.pushLimit = -1;
+
+    /**
+     * @property {number} struggle - Speed decrese ( velocity /= struggle * pushed mass), 0 = no decrese
+     * NOTE: This will probably change to allow more flexible calculations (strugglePower = struggle.c + struggle.k * mass).
+     * @default
+     */
+    this.struggle = 0;
+
+    /**
+     * @property {boolean} struggling - If the object is trying to move but not able, it will struggle :-)
+     * @readonly
+     */
+    this.struggling = false;
+
+    /**
+     * @property {number} facing - A const reference to the direction the Body is traveling or facing.
+     * @default
+     */
+    this.facing = Phaser.NONE;
+
+    /**
+     * @property {boolean} immovable - An immovable Body will not receive any impacts from other bodies.
+     * @default
+     */
+    this.immovable = false;
+
+    /**
+     * @property {boolean} collidable - The body will check collision only if collidible is set to true.
+     * @default
+     */
+    this.collidable = true;
+
+    /**
+     * A Body can be set to collide against the World bounds automatically and rebound back into the World if this is set to true. Otherwise it will leave the World.
+     * @property {boolean} collideWorldBounds - Should the Body collide with the World bounds?
+     */
+    this.collideWorldBounds = false;
+
+    /**
+     * @property {object} isMoving - Is populated with information if the body is actually moving.
+     * @readonly
+     */
+    this.isMoving = {
+      x: false,
+      y: false,
+      any: false
+    };
+
+    this.level = 0;
+
+    // MAYBE:
+    /**
+     * @property {Phaser.Signal} onMoveComplete - Listen for the completion of `moveTo` or `moveFrom` events.
+     */
+    //this.onMoveComplete = new Phaser.Signal();
+
+    this.moveTo = {
+      active: false,
+      path: [],
+      next: null,
+      recalc: 0 // 0 - never, 1 - if collision, 2 - each step (not impleneted yet)
+    };
+
+    this.magnetism = {
+      dragItself: false, // If the body's weight is less than the object it's trying to pull and it's movable=true it will be pulled to the object instead of the opposite
+      weakenByFactor: 1, //A power of 10 with weakenByFactor of 0.5 will have a power of 10*0.5 = 5 on one gridunit distance, and 10*0.5*0.5 = 2.5 on two.
+      maxRange: 1, // Stop magnetism after this amount of squares regardless of power or weakenByFactor
+      top: {
+        active: false,
+        power: 0, // 0 = Infinited, If dragged this magnetism could pull this mass without break seal.
+        pole: null, // any pole-id (could be NORTH/SOUTH), null == any
+        attractedTo: null, // any pole-id of other body
+        attractedToAll: false // Like a black hole.
+      },
+      right: {
+        active: false,
+        power: 0,
+        pole: null,
+        attractedTo: null,
+        attractedToAll: false
+      },
+      bottom: {
+        active: false,
+        power: 0,
+        pole: null,
+        attractedTo: null,
+        attractedToAll: false
+      },
+      left: {
+        active: false,
+        power: 0,
+        pole: null,
+        attractedTo: null,
+        attractedToAll: false
+      }
+    };
+
+    this.cojoinedBodies = []; // Array of bodies
+
+    this.collidingBodies = []; // [{active: Body, passive: Body}]
+    this.collectCollidingBodies = true;
+
+    /**
+     * @property {Phaser.Point} shadow - The shadow reserves tiles this object moves from while animating a move to prevent overlaps from other sprites.
+     * NOTE: Not yet entirely implemented
+     * @readonly
+     */
+    this._shadow = new Phaser.Geom.Point(0, 0);
+
+    /**
+     * @property {object} isLocked - Used to prevent body from doing new moves before the last is finished.
+     * NOTE: Not yet entirely implemented: May allow to turn in same direction and other stuff to make responsive.
+     * @readonly
+     */
+    this.isLocked = {
+      x: false,
+      y: false,
+      any: false
+    };
+
+    // MAY BE REMOVED:
+    this._longPress = 0; // 0 - X, 1-Y (längsta nedtryckt)
+
+    /**
+     * @property {Number} activeSteps - Number of steps the body has taken.
+     * NOTE: Not yet entirely implemented
+     * @readonly
+     */
+    this.activeSteps = 0;
+
+    /**
+     * @property {Number} passiveSteps - Number of steps the body has been forced to take (being pushed).
+     * NOTE: Not yet entirely implemented
+     * @readonly
+     */
+    this.passiveSteps = 0;
+
+    /**
+     *  Callbacks can override collisions. This is just for blocking behaviour. Set collectCollidingBodies to populate colliding bodies and getTilesUnderBody() to get all tiles a body i positioned over.
+     *  @property {Function} tile - Takes a tile and return new collision up, right, down and left values.
+     *  @property {Function} body - Takes a two bodies and return boolean weather the first should be considered solid
+     */
+    this.collisionCallback = {
+      tile: null,
+      body: null
+    };
+
+    this.myTurn = false;
+    this.turns = 0;
+    this.reload = 1;
+
+    this.onStairs = false;
+
+    this.sprite.setOrigin(0, 0);
+
+    this.snapToGrid();
+  }
+
+  _createClass(GridBody, [{
+    key: "snapToGrid",
+    value: function snapToGrid() {
+      this.gridPosition = {
+        x: Math.round(this.sprite.x / this.world.gridSize.x),
+        y: Math.round(this.sprite.y / this.world.gridSize.y)
+      };
+      this.sprite.x = this.world.gridSize.x * this.gridPosition.x - this.offset.x;
+      this.sprite.y = this.world.gridSize.y * this.gridPosition.y - this.offset.y;
+    }
+  }, {
+    key: "setPosition",
+    value: function setPosition() {
+      var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+      this.gridPosition.x = x;
+      this.gridPosition.y = y;
+      this.sprite.x = this.world.gridSize.x * this.gridPosition.x - this.offset.x;
+      this.sprite.y = this.world.gridSize.y * this.gridPosition.y - this.offset.y;
+      this.isLocked.x = false;
+      this.isLocked.y = false;
+    }
+  }, {
+    key: "setOffset",
+    value: function setOffset() {
+      var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+      this.offset.x = x;
+      this.offset.y = y;
+    }
+  }, {
+    key: "setVelocity",
+    value: function setVelocity(x) {
+      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      // longpress is not yet implemented
+      y = y !== null ? y : x;
+
+      if (x === 0 && y !== 0) {
+        this._longpress = 1;
+      } else if (y === 0 && x !== 0) {
+        this._longpress = 0;
+      }
+      this._desiredVelocity = {
+        x: x,
+        y: y
+      };
+    }
+  }, {
+    key: "_intersectRect",
+    value: function _intersectRect(r1, r2) {
+      return !(r2.x >= r1.x + r1.width || r2.x + r2.width <= r1.x || r2.y >= r1.y + r1.height || r2.y + r2.height <= r1.y);
+    }
+  }, {
+    key: "getTilesUnderBody",
+    value: function getTilesUnderBody() {
+      console.log("check", this);
+      return this.tilemap.getTilesUnderBody(this);
+    }
+  }, {
+    key: "testMove",
+    value: function testMove(dx, dy) {
+      var freeToGo = true;
+
+      if (!this.collidable) {
+        return true;
+      }
+
+      if (this.onStairs) {
+        this.level = this.tilemap.checkLevel(this.sprite, dx, dy);
+      }
+
+      if (this.tilemap.collide(this.sprite, dx, dy) && this.solid) {
+        return false;
+      }
+
+      if (!this.collectCollidingBodies && !freeToGo) {
+        return false;
+      }
+
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = this.world.bodies[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var body = _step.value;
+
+          if (this === body || !body.sprite.active) {
+            continue;
+          }
+
+          if (body.collidable && (body.level === this.level || body.onStairs)) {
+            // If not able to move and neither body is collecting colliding bodies, skip further checks
+            if (!freeToGo && !this.collectCollidingBodies && !body.collectCollidingBodies) {
+              continue;
+            }
+
+            if (this._intersectRect({
+              x: this.gridPosition.x + dx,
+              y: this.gridPosition.y + dy,
+              width: this.width,
+              height: this.height
+            }, {
+              x: body.gridPosition.x,
+              y: body.gridPosition.y,
+              width: body.width,
+              height: body.height
+            })) {
+              // Collect bodies if needed
+              if (this.collectCollidingBodies && this.collidingBodies.indexOf(body) === -1) {
+                this.collidingBodies.push(body);
+              }
+              if (body.collectCollidingBodies && body.collidingBodies.indexOf(this) === -1) {
+                body.collidingBodies.push(this);
+              }
+              // Collision callback
+              var bodyIsSolid = this.collisionCallback.body ? this.collisionCallback.body(body, this) : body.solid;
+
+              // Check how the other body might affect this one
+              if (!this.solid || !bodyIsSolid) {
+                continue;
+              }
+
+              if (body.immovable) {
+                freeToGo = false;
+              } else {
+                if (this.world._pushChain.indexOf(body) === -1) {
+                  this.world._pushChain.push(body); // Tryck på denna
+                  if (!body.testMove(dx, dy)) {
+                    // kolla upp kroppen
+                    freeToGo = false;
+                  }
+                }
+              }
+            }
+          }
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      return freeToGo;
+    }
+  }, {
+    key: "postUpdate",
+    value: function postUpdate() {
+      this.collidingBodies = [];
+      this.justMoved = false;
+      if (this.isLocked.x || this.isLocked.y) {
+        return;
+      }
+
+      if (this.moveTo.active) {
+        this._desiredVelocity = {
+          x: 0,
+          y: 0
+        };
+        var dest = this.moveTo.path[this.moveTo.next];
+        if (dest.x < this.gridPosition.x) {
+          this._desiredVelocity.x = -100;
+        } else if (dest.x > this.gridPosition.x) {
+          this._desiredVelocity.x = 100;
+        } else if (dest.y < this.gridPosition.y) {
+          this._desiredVelocity.y = -100;
+        } else if (dest.y > this.gridPosition.y) {
+          this._desiredVelocity.y = 100;
+        }
+        this.moveTo.next++;
+        if (this.moveTo.next > this.moveTo.path.length - 1) {
+          this.moveTo.active = false;
+        }
+      }
+
+      this.isMoving = {
+        x: false,
+        y: false,
+        any: false
+      };
+
+      if (this._desiredVelocity.x === 0 && this._desiredVelocity.y === 0) {
+        this.velocity.x = 0;
+        this.velocity.y = 0;
+        this.struggling = false;
+        return;
+      }
+
+      this.world._pushChain = [];
+      var moveOk = true;
+      var _d = {};
+      var _arr = ["x", "y"];
+      for (var _i = 0; _i < _arr.length; _i++) {
+        var dim = _arr[_i];
+        _d[dim] = this._desiredVelocity[dim] === 0 ? 0 : this._desiredVelocity[dim] > 0 ? 1 : -1;
+      }
+
+      var _arr2 = [0, 1];
+      for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
+        var _dim = _arr2[_i2];
+        // Array här ändrar ordning efter prio
+        if (_dim === 0) {
+          if (_d.x === 0) {
+            continue;
+          }
+          if (!this.testMove(_d.x, 0)) {
+            moveOk = false;
+            break;
+          } else {
+            moveOk = true;
+          }
+        } else {
+          if (_d.y === 0) {
+            continue;
+          }
+          if (!this.testMove(0, _d.y)) {
+            moveOk = false;
+            break;
+          } else {
+            moveOk = true;
+          }
+        }
+      }
+
+      // Check if strong enough
+      if (this.strength > -1 || this.struggle > 1) {
+        var totalMass = 0;
+        var _iteratorNormalCompletion2 = true;
+        var _didIteratorError2 = false;
+        var _iteratorError2 = undefined;
+
+        try {
+          for (var _iterator2 = this.world._pushChain[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            var body = _step2.value;
+
+            totalMass += body.mass;
+          }
+        } catch (err) {
+          _didIteratorError2 = true;
+          _iteratorError2 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+              _iterator2.return();
+            }
+          } finally {
+            if (_didIteratorError2) {
+              throw _iteratorError2;
+            }
+          }
+        }
+
+        if (this.strength > -1 && totalMass > this.strength) {
+          moveOk = false;
+        }
+        if (this.struggle > 1 && totalMass > 0) {
+          this._desiredVelocity.x = this._desiredVelocity.x / (totalMass * this.struggle);
+          this._desiredVelocity.y = this._desiredVelocity.y / (totalMass * this.struggle);
+        }
+      }
+      if (this.pushLimit > -1 && this.world._pushChain.length > this.pushLimit) {
+        moveOk = false;
+      }
+
+      if (!moveOk) {
+        if (this._desiredVelocity.x !== 0 || this._desiredVelocity.y !== 0) {
+          this.struggling = true;
+        }
+        if (this._desiredVelocity.x > 0) {
+          this.facing = Phaser.RIGHT;
+        } else if (this._desiredVelocity.x < 0) {
+          this.facing = Phaser.LEFT;
+        } else if (this._desiredVelocity.y < 0) {
+          this.facing = Phaser.UP;
+        } else if (this._desiredVelocity.y > 0) {
+          this.facing = Phaser.DOWN;
+        }
+        this.velocity.x = 0;
+        this.velocity.y = 0;
+        this._shadow.x = 0;
+        this._shadow.y = 0;
+
+        return;
+      }
+
+      var _arr3 = ["x", "y"];
+      for (var _i3 = 0; _i3 < _arr3.length; _i3++) {
+        var _dim2 = _arr3[_i3];
+        this.velocity[_dim2] = this._desiredVelocity[_dim2];
+        this._shadow[_dim2] = 0;
+        if (this.velocity[_dim2] != 0) {
+          this.gridPosition[_dim2] += this.velocity[_dim2] > 0 ? 1 : -1;
+          this.isLocked[_dim2] = true;
+          this._shadow[_dim2] = this.velocity[_dim2] < 0 ? 1 : -1;
+
+          var _iteratorNormalCompletion3 = true;
+          var _didIteratorError3 = false;
+          var _iteratorError3 = undefined;
+
+          try {
+            for (var _iterator3 = this.world._pushChain[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+              var _body = _step3.value;
+
+              _body.passiveSteps++;
+              _body.snapToGrid();
+              _body.velocity[_dim2] = this._desiredVelocity[_dim2];
+              _body.gridPosition[_dim2] += _body.velocity[_dim2] > 0 ? 1 : -1;
+              _body.isLocked[_dim2] = true;
+              _body.onStairs = this.checkStairs(_body);
+            }
+          } catch (err) {
+            _didIteratorError3 = true;
+            _iteratorError3 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                _iterator3.return();
+              }
+            } finally {
+              if (_didIteratorError3) {
+                throw _iteratorError3;
+              }
+            }
+          }
+        }
+      }
+
+      if (this.velocity.x > 0) {
+        this.facing = Phaser.RIGHT;
+      } else if (this.velocity.x < 0) {
+        this.facing = Phaser.LEFT;
+      } else if (this.velocity.y < 0) {
+        this.facing = Phaser.UP;
+      } else if (this.velocity.y > 0) {
+        this.facing = Phaser.DOWN;
+      }
+
+      if (this.velocity.x !== 0) {
+        this.isMoving.x = true;
+      }
+      if (this.velocity.y !== 0) {
+        this.isMoving.y = true;
+      }
+      this.isMoving.any = true;
+      this.struggling = false;
+
+      this.baseVelocity = 75;
+      this.activeSteps++;
+      this.justMoved = true;
+
+      var wasOnStairs = this.onStairs;
+
+      this.onStairs = this.checkStairs(this);
+
+      if (wasOnStairs && !this.onStairs) {
+        // HACK
+        if (this.level === 1) {
+          this.sprite.setDepth(11);
+        } else {
+          this.sprite.setDepth(1);
+        }
+      }
+    }
+  }, {
+    key: "checkStairs",
+    value: function checkStairs(body) {
+      var pos = body.gridPosition;
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
+
+      try {
+        for (var _iterator4 = this.world.stairs[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var stairs = _step4.value;
+
+          if (pos.x < stairs.x + stairs.width && pos.x + body.width > stairs.x && pos.y < stairs.y + stairs.height && body.height + pos.y > stairs.y) {
+            body.sprite.setDepth(1000);
+            return true;
+          }
+        }
+      } catch (err) {
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+            _iterator4.return();
+          }
+        } finally {
+          if (_didIteratorError4) {
+            throw _iteratorError4;
+          }
+        }
+      }
+
+      return false;
+    }
+
+    /**
+     * Draws this Body's boundary and velocity, if enabled.
+     *
+     * @method Phaser.Physics.Arcade.Body#drawDebug
+     * @since 3.0.0
+     *
+     * @param {Phaser.GameObjects.Graphics} graphic - The Graphics object to draw on.
+     */
+
+  }, {
+    key: "drawDebug",
+    value: function drawDebug(graphic) {
+      var x = this.gridPosition.x * this.world.gridSize.x;
+      var y = this.gridPosition.y * this.world.gridSize.y;
+      var w = this.width * this.world.gridSize.x;
+      var h = this.height * this.world.gridSize.y;
+
+      if (true) {
+        graphic.lineStyle(1, "0xFFFFFF"); //this.debugBodyColor
+        if (!this.sprite.active) {
+          graphic.lineStyle(1, "0xFF0000"); //this.debugBodyColor
+        }
+        graphic.strokeRect(x, y, w, h);
+      }
+      /*if (this.debugShowVelocity)
+          {
+              graphic.lineStyle(1, this.world.defaults.velocityDebugColor, 1);
+              graphic.lineBetween(x, y, x + this.velocity.x / 2, y + this.velocity.y / 2);
+          }*/
+    }
+
+    /*renderDebugBody() {
+           if (!this.debugBody) {
+               this.debugBody = new Phaser.Rectangle(sprite.x, sprite.y, sprite.width, sprite.height);
+               this.debugShadow = new Phaser.Rectangle(sprite.x, sprite.y, sprite.width, sprite.height);
+           }
+            this.debugBody.x = this.gridPosition.x * this.world.gridSize.x;
+           this.debugBody.y = this.gridPosition.y * this.world.gridSize.y;
+           this.debugShadow.x = this.gridPosition.x * this.world.gridSize.x + this.world.gridSize.x * this._shadow.x;
+           this.debugShadow.y = this.gridPosition.y * this.world.gridSize.y + this.world.gridSize.y * this._shadow.y;
+           if (this._shadow.x == 0) {
+               this.debugShadow.width = this.sprite.width;
+               this.debugShadow.height = this.world.gridSize.y;
+           } else {
+               this.debugShadow.width = this.world.gridSize.x;
+               this.debugShadow.height = this.sprite.height;
+            }
+           game.debug.geom(this.debugBody, 'rgba(0,255,0,0.4)');
+       }*/
+
+    /*renderBodyInfo(debug, body) {
+           debug.line('x: ' + body.gridPosition.x, 'y: ' + body.gridPosition.y, 'width: ' + body.width, 'height: ' + body.height);
+           /*debug.line('x: ' + body.x.toFixed(2), 'y: ' + body.y.toFixed(2), 'width: ' + body.width, 'height: ' + body.height);
+           debug.line('velocity x: ' + body.velocity.x.toFixed(2), 'y: ' + body.velocity.y.toFixed(2), 'deltaX: ' + body._dx.toFixed(2), 'deltaY: ' + body._dy.toFixed(2));
+           debug.line('acceleration x: ' + body.acceleration.x.toFixed(2), 'y: ' + body.acceleration.y.toFixed(2), 'speed: ' + body.speed.toFixed(2), 'angle: ' + body.angle.toFixed(2));
+           debug.line('gravity x: ' + body.gravity.x, 'y: ' + body.gravity.y, 'bounce x: ' + body.bounce.x.toFixed(2), 'y: ' + body.bounce.y.toFixed(2));
+           debug.line('touching left: ' + body.touching.left, 'right: ' + body.touching.right, 'up: ' + body.touching.up, 'down: ' + body.touching.down);
+           debug.line('blocked left: ' + body.blocked.left, 'right: ' + body.blocked.right, 'up: ' + body.blocked.up, 'down: ' + body.blocked.down);* /
+    }
+    */
+
+    /* moveToPixelXY(x, y, speed = 60, maxTime = 0, active = true) {
+            x = Math.round(x / this.world.gridSize.x);
+            y = Math.round(y / this.world.gridSize.y);
+            this.moveToXY(x, y, speed, maxTime, active);
+        }*/
+
+    /* moveToXY(x, y, speed = 60, maxTime = 0, active = true) {
+            /*
+              Yes, I know that this is ridiculously inefficient rebuilding the grid from the tilemap
+              on each call without any cache, and trying to find the path of the full current map
+              even if it's not necessarily in most cases.
+               It's also still buggy. Different bodysizes and stuff is a challenge, and now
+              the body size is locked to 2x2 of the grid size.
+               And, also it just checks the first tilemap layer for collision even if you added more.
+             * /
+              if (typeof(EasyStar) === 'undefined') {
+                console.error("Grid Physics error: Easystar.js must be enabled!");
+                return;
+            }
+            if (this.physics.render.path || this.physics.render.pathCollision) {
+                this.physics.resetDebugRenderer();
+            }
+             let easystar = new EasyStar.js();
+             // Generate array
+            // Respond
+            let grid = [];
+            let i = 0;
+            let tileRatio = {
+                x: this.physics.tilemaplayers[0].layer.data[0][0].width / game.physics.gridPhysics.gridSize.x,
+                y: this.physics.tilemaplayers[0].layer.data[0][0].height / game.physics.gridPhysics.gridSize.y
+            };
+            for (let row of this.physics.tilemaplayers[0].layer.data) {
+                grid[i] = [];
+                grid[i + 1] = [];
+                for (let tile of row) {
+                    if (tile.collideUp && tile.collideDown && tile.collideLeft && tile.collideRight) { // ¦¦ --> && när conditional
+                        for (let dy = 0; dy < tileRatio.y; dy++) {
+                            for (let dx = 0; dx < tileRatio.x; dx++) {
+                                grid[i + dx].push(1);
+                            }
+                        }
+                    } else if (tile.collideUp || tile.collideDown || tile.collideLeft || tile.collideRight) {
+                        for (let dy = 0; dy < tileRatio.y; dy++) {
+                            for (let dx = 0; dx < tileRatio.x; dx++) {
+                                grid[i + dx].push(4);
+                            }
+                        }
+                    } else {
+                        for (let dy = 0; dy < tileRatio.y; dy++) {
+                            for (let dx = 0; dx < tileRatio.x; dx++) {
+                                grid[i + dx].push(0);
+                            }
+                        }
+                    }
+                }
+                //i++;
+                i += tileRatio.y;
+            }
+             // Bodies
+            for (let body of this.physics.bodies) {
+                if (body === this) {
+                    continue;
+                }
+                for (let x = 0; x < body.width; x++) {
+                    for (let y = 0; y < body.height; y++) {
+                        grid[body.gridPosition.y + y][body.gridPosition.x + x] = 3;
+                     }
+                }
+            }
+    
+             // Smalare korridorer
+            for (let y = 0; y < grid.length; y++) {
+                 for (let x = 0; x < grid[0].length; x++) {
+                    if (x > 0 && grid[y][x] > 0 && grid[y][x] < 4) {
+                        if (grid[y][x - 1] == 0 || grid[y][x - 1] == 4) {
+                            grid[y][x - 1] = 2;
+                        }
+                        if (y > 0 && grid[y - 1][x] == 0 || grid[y][x - 1] == 4) {
+                            grid[y - 1][x] = 2;
+                        }
+                        if (x > 0 && y > 0 && grid[y - 1][x - 1] == 0 || grid[y][x - 1] == 4) {
+                            grid[y - 1][x - 1] = 2;
+                        }
+                    }
+                }
+             }
+              //debugger;
+            //        console.warn(grid);
+             this.physics.renderPathCollision(grid);
+    
+            easystar.setGrid(grid);
+              // Directional condition
+            for (let y = 0; y < grid.length; y++) {
+                for (let x = 0; x < grid[0].length; x++) {
+                     if (grid[y][x] === 4) {
+                        let tile = this.physics.tilemaplayers[0].layer.data[Math.round(y / 2)][Math.round(x / 2)];
+                        let paths = []; //;
+                        if (!tile.collideUp) {
+                            paths.push(EasyStar.BOTTOM);
+                        }
+                        if (!tile.collideRight) {
+                            paths.push(EasyStar.LEFT);
+                        }
+                        if (!tile.collideDown) {
+                            paths.push(EasyStar.TOP);
+                        }
+                        if (!tile.collideLeft) {
+                            paths.push(EasyStar.RIGHT);
+                        }
+                        grid[y][x] = 0;
+                        easystar.setDirectionalCondition(x, y, paths);
+                    }
+                }
+            }
+             easystar.setAcceptableTiles([0, 4]);
+             easystar.findPath(this.gridPosition.x, this.gridPosition.y, x, y, (path) => {
+                if (path === null) {
+                    //console.log("Path was not found.");
+                } else if (path.length > 0) {
+                    //    console.log("Path was found. The first Point is " + path[1].x + " " + path[1].y, this);
+                    this.moveTo = {
+                        active: true,
+                        path,
+                        next: 1,
+                        velocity: speed,
+                        recalc: 0
+                    };
+                    this.physics.renderPath(this.moveTo.path);
+                     /*this.moveTo.x =
+                    this.moveTo.y = path[1].y*2;*/
+    /*  if (x < this.gridPosition.x) {
+                       //  this.setVelocity(-speed, 0);
+                         this.moveTo.x = -1;
+                     }
+                     else if (x > this.gridPosition.x) {
+                       //  this.setVelocity(speed, 0);
+                         this.moveTo.x = 1;
+                     }
+                     else if (y < this.gridPosition.y) {
+                       //  this.setVelocity(0, -speed);
+                         this.moveTo.y = -1;
+                     } else if (y > this.gridPosition.y) {
+                       //  this.setVelocity(0, speed);
+                         this.moveTo.y = 1;
+                     }* /
+               }
+           });
+           easystar.setIterationsPerCalculation(1000);
+           easystar.calculate();
+            // This.isMovingToXY = {active: true, x,y,speed) <-- Kör på automatiskt medan detta finns. Testa ny väg vid varje stopp
+       }*/
+
+  }]);
+
+  return GridBody;
+}();
+
+exports.default = GridBody;
+
+/***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _world = __webpack_require__(2);
-
-var _world2 = _interopRequireDefault(_world);
-
-var _tilemap = __webpack_require__(0);
-
-var _tilemap2 = _interopRequireDefault(_tilemap);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+var Tilemap = function () {
+  function Tilemap() {
+    _classCallCheck(this, Tilemap);
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * @author       Niklas Berg <nkholski@niklasberg.se>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * @copyright    2018 Niklas Berg
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * @license      {@link https://github.com/nkholski/phaser3-animated-tiles/blob/master/LICENSE|MIT License}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-//
-// This plugin is based on Photonstorms Phaser 3 plugin template with added support for ES6.
-//
-
-var GridPhysics = function (_Phaser$Plugins$Scene) {
-  _inherits(GridPhysics, _Phaser$Plugins$Scene);
-
-  function GridPhysics(scene, pluginManager) {
-    _classCallCheck(this, GridPhysics);
-
-    var _this = _possibleConstructorReturn(this, (GridPhysics.__proto__ || Object.getPrototypeOf(GridPhysics)).call(this, scene, pluginManager));
-
-    var config = scene.registry.parent.config.physics.grid;
-    if (scene.registry.parent.config.physics.grid) {
-      var gridSize = config.gridSize;
-      if (!gridSize) {
-        gridSize = { x: 8, y: 8 };
-      }
-      if (typeof gridSize === "number") {
-        gridSize = { x: gridSize, y: gridSize };
-      } else if (!gridSize.hasOwnProperty("x") || !gridSize.hasOwnProperty("y")) {
-        gridSize = { x: 8, y: 8 };
-      }
-      config = {
-        debug: config.debug ? true : false,
-        gridSize: gridSize
-      };
-    }
-
-    Phaser.Physics.GridPhysics = _this;
-    //  The Scene that owns this plugin
-    //this.scene = scene;
-    _this.world = new _world2.default(scene, config);
-    _this.tilemap = new _tilemap2.default();
-    scene.gridPhysics = _this;
-    //this.systems = scene.sys;
-
-    if (!scene.sys.settings.isBooted) {
-      scene.sys.events.once("boot", _this.boot, _this);
-    }
-    return _this;
+    this.tilemaps = [];
+    this.world = Phaser.Physics.GridPhysics.world;
   }
 
-  //  Called when the Plugin is booted by the PluginManager.
-  //  If you need to reference other systems in the Scene (like the Loader or DisplayList) then set-up those references now, not in the constructor.
+  _createClass(Tilemap, [{
+    key: "collide",
+    value: function collide(source) {
+      var dx = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      var dy = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+      var layers = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : this.world.tilemaplayers;
+      var slide = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
+      var position = void 0,
+          width = void 0,
+          height = void 0,
+          collideWorldBounds = void 0,
+          returnTile = void 0,
+          level = void 0,
+          callback = void 0;
 
-  _createClass(GridPhysics, [{
-    key: "boot",
-    value: function boot() {
-      var eventEmitter = this.systems.events;
-      eventEmitter.on("update", this.update, this);
-      eventEmitter.on("postupdate", this.postUpdate, this);
-      eventEmitter.on("shutdown", this.shutdown, this);
-      eventEmitter.on("destroy", this.destroy, this);
+      // Sort out variables to work with, either from a sprite with a body or just an object
+      if (source.hasOwnProperty("body")) {
+        position = {
+          x: source.body.gridPosition.x,
+          y: source.body.gridPosition.y
+        };
+        width = source.body.width;
+        height = source.body.height;
+        collideWorldBounds = source.body.collideWorldBounds;
+        level = source.body.level;
+        callback = source.body.collisionCallback.tile;
+      } else {
+        position = {
+          x: source.x,
+          y: source.y
+        };
+        width = source.width ? source.width : 1;
+        height = source.height ? source.height : 1;
+        collideWorldBounds = source.hasOwnProperty("collideWorldBounds") ? source.collideWorldBounds : false;
+        returnTile = true;
+        level = source.level ? source.level : 0;
+        callback = source.collisionCallback ? source.body.collisionCallback.tile : null;
+      }
+      // Prevent going outside the tilemap?
+
+      if (collideWorldBounds && (position.x + dx < 0 || position.y + dy < 0 || position.x + dx + width > this.world.tilemaplayers[0].width / this.world.gridSize.x || position.y + dy + height > this.world.tilemaplayers[0].height / this.world.gridSize.y)) {
+        return true;
+      }
+      // Update the position to the attempted movement
+      position.x += dx;
+      position.y += dy;
+
+      // Slim the body to prevent unnecessary collision checks (not that the physics are particulary demanding but anyway)
+      if (dx !== 0) {
+        if (dx > 0) {
+          position.x += width - 1;
+        }
+        width = 1;
+      } else if (dy !== 0) {
+        if (dy > 0) {
+          position.y += height - 1;
+        }
+        height = 1;
+      }
+
+      for (var x = position.x; x < position.x + width; x++) {
+        for (var y = position.y; y < position.y + height; y++) {
+          var collide = false;
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = this.world.tilemaplayers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var layer = _step.value;
+
+              if (level > layer.level) {
+                continue;
+              }
+
+              //let tile = this.world.map.getTileAt(Math.floor(x * this.world.gridSize.x / layer.collisionWidth), Math.floor(y * this.world.gridSize.y / layer.collisionHeight), layer, true);
+              var collisionHeight = layer.layer.baseTileHeight;
+              var collisionWidth = layer.layer.baseTileHeight;
+
+              //layer.collisionWidth = 16;
+              //let tile = this.world.getTileAt(Math.floor(x * this.world.gridSize.x / layer.collisionWidth), Math.floor(y * this.world.gridSize.y / layer.collisionHeight), layer, true);
+              //debugger;
+
+              var checkY = Math.floor(y * this.world.gridSize.y / collisionHeight);
+              var checkX = void 0;
+              if (checkY < 0 || checkY > layer.layer.data.length - 1) {
+                if (this.collideWorldBounds) {
+                  return true;
+                } else {
+                  continue;
+                }
+              } else {
+                checkX = Math.floor(x * this.world.gridSize.x / collisionWidth);
+                if (checkX < 0 || checkY > layer.layer.data[checkY].length - 1) {
+                  if (this.collideWorldBounds) {
+                    return true;
+                  } else {
+                    continue;
+                  }
+                }
+              }
+
+              var tile = layer.layer.data[checkY][checkX] || null;
+
+              if (tile && tile.index === -1 && layer.level > 0 && level > 0) {
+                // HACK
+                console.log(layer.level);
+                return true;
+              }
+
+              if (returnTile) {
+                console.log(tile, checkX, checkY);
+              }
+
+              if (tile === null || tile.index === -1 && !tile.gotBorder) {
+                // No tile, or empty - OK
+                continue;
+              }
+
+              var tileCollider = callback ? callback(tile) : tile;
+
+              if (tileCollider.collideRight && tileCollider.collideLeft && tileCollider.collideDown && tileCollider.collideUp) {
+                // tile collides whatever direction the body enter
+                collide = true;
+                break;
+              } else if (dx < 0 && tileCollider.collideRight) {
+                // moving left and the tile collides from the right
+                //console.log("Collide RIGHT", tile)
+                collide = true;
+                break;
+              } else if (dx > 0 && tileCollider.collideLeft) {
+                //console.log("Collide KEFT", tile)
+                collide = true;
+                break;
+              }
+              if (dy < 0 && tileCollider.collideDown) {
+                //console.log("Collide DOWN", tile)
+                collide = true;
+                break;
+              } else if (dy > 0 && tileCollider.collideUp) {
+                //console.log("Collide UP", tile)
+                collide = true;
+                break;
+              }
+
+              // Prevents bodies to walk with path of body outside of blocked tile side
+              /* if (dx != 0) {
+                             if (tile.borderUp && position.y < tile.y * tileRatio.y) {
+                                 collide = true;
+                                 break;
+                             } else if (tile.borderDown && position.y + height > tile.y * tileRatio.y) {
+                                 collide = true;
+                                 break;
+                             }
+                         }
+                         if (dy != 0) {
+                             if (tile.borderLeft && position.x < tile.x * tileRatio.x) {
+                                 collide = true;
+                                 break;
+                             } else if (tile.borderRight && position.x + width > tile.x * tileRatio.x) {
+                                 collide = true;
+                                 break;
+                             }
+                         }*/
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          if (collide) {
+            if (slide) {
+              // Left-over from previous working version, needs review...
+              if (dx !== 0) {
+                if (!this.collide(source, dx, dy - 1)) {
+                  return {
+                    dx: dx,
+                    dy: dy - 1
+                  };
+                } else if (!this.collide(source, dx, dy + 1)) {
+                  return {
+                    dx: dx,
+                    dy: dy + 1
+                  };
+                }
+              }
+              if (dy !== 0) {
+                if (!this.collide(source, dx - 1, dy)) {
+                  return {
+                    dx: dx - 1,
+                    dy: dy
+                  };
+                } else if (!this.collide(source, dx + 1, dy)) {
+                  return {
+                    dx: dx + 1,
+                    dy: dy
+                  };
+                }
+              }
+            }
+            return {
+              dx: 0,
+              dy: 0
+            };
+          }
+        }
+      }
+      return false;
     }
   }, {
-    key: "postUpdate",
-    value: function postUpdate(time, delta) {
-      this.world.bodies.forEach(function (body) {
-        body.sprite.active ? body.postUpdate() : null;
+    key: "getTilesUnderBody",
+    value: function getTilesUnderBody(body) {
+      console.log("Check", body.gridPosition.x, body.gridPosition.y, body.width, body.height);
+
+      return this.getTilesAt(body.gridPosition.x, body.gridPosition.y, body.width, body.height);
+    }
+  }, {
+    key: "getTilesAt",
+    value: function getTilesAt(x, y, width, height) {
+      var tileScaleX = 2;
+      var tileScaleY = 2;
+      var tiles = [];
+
+      var startX = Math.floor(x / tileScaleX);
+      startX = startX < 0 ? 0 : startX;
+
+      var startY = Math.floor(y / tileScaleY);
+      startY = startY < 0 ? 0 : startY;
+
+      var stopX = Math.floor((x + width) / tileScaleX);
+      stopX = stopX > this.world.tilemaplayers[0].tilemap.width ? this.world.tilemaplayers[0].tilemap.width : stopX;
+
+      var stopY = Math.floor(y + height) / tileScaleY;
+      stopY = stopY > this.world.tilemaplayers[0].tilemap.height ? this.world.tilemaplayers[0].tilemap.height : stopY;
+
+      console.log("scan x=" + startX + " to " + stopX + " amd y=" + startY + " to " + stopY);
+
+      this.world.tilemaplayers.forEach(function (layer, layerIndex) {
+        tiles[layerIndex] = [];
+
+        for (var checkX = startX; checkX < stopX; checkX += tileScaleX) {
+          for (var checkY = startY; checkY < stopY; checkY += tileScaleY) {
+            var tile = layer.layer.data[checkY][checkX] || null;
+            if (tile) {
+              tiles[layerIndex].push(tile);
+            }
+          }
+        }
       });
+      return tiles;
     }
   }, {
-    key: "update",
-    value: function update(time, delta) {
-      this.world.update(time, delta);
-    }
-    //  Called when a Scene shuts down, it may then come back again later (which will invoke the 'start' event) but should be considered dormant.
+    key: "checkLevel",
+    value: function checkLevel(source, dx, dy) {
+      var position = void 0,
+          width = void 0,
+          height = void 0;
+      var level = 0;
 
-  }, {
-    key: "shutdown",
-    value: function shutdown() {}
+      // DRY FAIL: Slightly modified copy from collision
+      if (source.hasOwnProperty("body")) {
+        position = {
+          x: source.body.gridPosition.x,
+          y: source.body.gridPosition.y
+        };
+        width = source.body.width;
+        height = source.body.height;
+      } else {
+        position = {
+          x: source.x,
+          y: source.y
+        };
+        width = source.width ? source.width : 1;
+        height = source.height ? source.height : 1;
+      }
 
-    //  Called when a Scene is destroyed by the Scene Manager. There is no coming back from a destroyed Scene, so clear up all resources here.
+      position.x += dx;
+      position.y += dy;
 
-  }, {
-    key: "destroy",
-    value: function destroy() {
-      this.shutdown();
-      this.scene = undefined;
+      if (dx !== 0) {
+        width = 1;
+      } else {
+        height = 1;
+      }
+
+      if (dx > 0) {
+        position.x = position.x + width;
+      } else if (dy > 0) {
+        position.y = position.y + height;
+      }
+
+      // Return level a sprite move to, higher level is prioritized
+      for (var x = position.x; x < position.x + width; x++) {
+        for (var y = position.y; y < position.y + height; y++) {
+          var _iteratorNormalCompletion2 = true;
+          var _didIteratorError2 = false;
+          var _iteratorError2 = undefined;
+
+          try {
+            for (var _iterator2 = this.world.tilemaplayers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+              var layer = _step2.value;
+
+              var tile = layer.layer.data[Math.floor(y / 2)][Math.floor(x / 2)];
+
+              console.log(layer, layer.level, x, y, tile);
+
+              if (tile && tile.index > 0 && layer.level > level) {
+                level = layer.level;
+              }
+            }
+          } catch (err) {
+            _didIteratorError2 = true;
+            _iteratorError2 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                _iterator2.return();
+              }
+            } finally {
+              if (_didIteratorError2) {
+                throw _iteratorError2;
+              }
+            }
+          }
+        }
+      }
+      console.log("LEVEL", level);
+      return level;
     }
   }]);
 
-  return GridPhysics;
-}(Phaser.Plugins.ScenePlugin);
+  return Tilemap;
+}();
 
-//  Static function called by the PluginFile Loader.
-
-
-GridPhysics.register = function (PluginManager) {
-  //  Register this plugin with the PluginManager, so it can be added to Scenes.
-  PluginManager.register("GridPhysics", GridPhysics, "GridPhysics");
-};
-
-module.exports = GridPhysics;
+exports.default = Tilemap;
 
 /***/ })
 /******/ ]);

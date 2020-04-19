@@ -23,12 +23,12 @@ class GridBody {
 
     // TODO:
     /**
-     * @property {Phaser.Point} offset - The offset of the Physics Body from the Sprite x/y this.gridPosition.
+     * @property {Phaser.Geom.Point} offset - The offset of the Physics Body from the Sprite x/y this.gridPosition.
      */
-    //  this.offset = new Phaser.Point();
+     this.offset = new Phaser.Geom.Point(0, 0);
 
     /**
-     * @property {Phaser.Point} position - The position of the physics body.
+     * @property {Phaser.Geom.Point} position - The position of the physics body.
      * @readonly
      */
     this.gridPosition = new Phaser.Geom.Point(0, 0);
@@ -252,17 +252,22 @@ class GridBody {
       x: Math.round(this.sprite.x / this.world.gridSize.x),
       y: Math.round(this.sprite.y / this.world.gridSize.y)
     };
-    this.sprite.x = this.world.gridSize.x * this.gridPosition.x;
-    this.sprite.y = this.world.gridSize.y * this.gridPosition.y;
+    this.sprite.x = this.world.gridSize.x * this.gridPosition.x - this.offset.x;
+    this.sprite.y = this.world.gridSize.y * this.gridPosition.y - this.offset.y;
   }
 
   setPosition(x = 0, y = 0) {
     this.gridPosition.x = x;
     this.gridPosition.y = y;
-    this.sprite.x = this.world.gridSize.x * this.gridPosition.x;
-    this.sprite.y = this.world.gridSize.y * this.gridPosition.y;
+    this.sprite.x = this.world.gridSize.x * this.gridPosition.x - this.offset.x;
+    this.sprite.y = this.world.gridSize.y * this.gridPosition.y - this.offset.y;
     this.isLocked.x = false;
     this.isLocked.y = false;
+  }
+
+  setOffset(x = 0, y = 0) {
+    this.offset.x = x;
+    this.offset.y = y;
   }
 
   setVelocity(x, y = null) {

@@ -1,9 +1,5 @@
 'use strict';
 
-const webpack = require('webpack');
-const path = require('path');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-
 module.exports = {
     mode: 'production',
     watch: false,
@@ -20,24 +16,6 @@ module.exports = {
         libraryTarget: 'umd',
         umdNamedDefine: true
     },
-
-    plugins: [
-        new UglifyJSPlugin({
-            include: /\.min\.js$/,
-            parallel: true,
-            sourceMap: false,
-            uglifyOptions: {
-                compress: true,
-                ie8: false,
-                ecma: 5,
-                output: {
-                    comments: false
-                },
-                warnings: true
-            },
-        })
-
-    ],
 
     module: {
         rules: [{
