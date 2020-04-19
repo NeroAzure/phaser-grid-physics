@@ -213,7 +213,7 @@ export default class World {
       for (let dim of ["x", "y"]) {
         if (body.velocity[dim] === 0) {
           // Stannat, fixa positionen exakt.
-          body.sprite[dim] = body.gridPosition[dim] * body.world.gridSize[dim];
+          body.sprite[dim] = body.gridPosition[dim] * body.world.gridSize[dim] - body.offset[dim];
           continue;
         }
         if (

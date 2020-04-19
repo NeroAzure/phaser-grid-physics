@@ -469,7 +469,7 @@ var World = function () {
             var dim = _arr[_i];
             if (body.velocity[dim] === 0) {
               // Stannat, fixa positionen exakt.
-              body.sprite[dim] = body.gridPosition[dim] * body.world.gridSize[dim];
+              body.sprite[dim] = body.gridPosition[dim] * body.world.gridSize[dim] - body.offset[dim];
               continue;
             }
             if (body.gridPosition[dim] * body.world.gridSize[dim] != body.sprite[dim]) {
