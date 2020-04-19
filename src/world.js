@@ -75,9 +75,9 @@ export default class World {
       case "DynamicTilemapLayer":
       case "StaticTilemapLayer":
         if (
-          (this.showWarnings &&
-            entity.collisionWidth % this.gridSize.x !== 0) ||
-          entity.collisionWidth % this.gridSize.x !== 0
+          this.showWarnings &&
+            (entity.collisionWidth % this.gridSize.x !== 0
+              || entity.collisionHeight % this.gridSize.y !== 0)
         ) {
           console.warn(
             "Tile size isn't an even multiplier of the grid size. This will probably break your game."

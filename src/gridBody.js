@@ -25,7 +25,10 @@ class GridBody {
     /**
      * @property {Phaser.Geom.Point} offset - The offset of the Physics Body from the Sprite x/y this.gridPosition.
      */
-     this.offset = new Phaser.Geom.Point(0, 0);
+    this.offset = new Phaser.Geom.Point(
+      sprite.offset ? sprite.offset.x : 0,
+      sprite.offset ? sprite.offset.y : 0
+    );
 
     /**
      * @property {Phaser.Geom.Point} position - The position of the physics body.

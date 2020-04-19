@@ -321,7 +321,7 @@ var World = function () {
           break;
         case "DynamicTilemapLayer":
         case "StaticTilemapLayer":
-          if (this.showWarnings && entity.collisionWidth % this.gridSize.x !== 0 || entity.collisionWidth % this.gridSize.x !== 0) {
+          if (this.showWarnings && (entity.collisionWidth % this.gridSize.x !== 0 || entity.collisionHeight % this.gridSize.y !== 0)) {
             console.warn("Tile size isn't an even multiplier of the grid size. This will probably break your game.");
           }
           this.tilemaplayers.push(entity);
@@ -883,7 +883,7 @@ var GridBody = function () {
     /**
      * @property {Phaser.Geom.Point} offset - The offset of the Physics Body from the Sprite x/y this.gridPosition.
      */
-    this.offset = new Phaser.Geom.Point(0, 0);
+    this.offset = new Phaser.Geom.Point(sprite.offset ? sprite.offset.x : 0, sprite.offset ? sprite.offset.y : 0);
 
     /**
      * @property {Phaser.Geom.Point} position - The position of the physics body.
