@@ -216,24 +216,17 @@ export default class World {
           body.sprite[dim] = body.gridPosition[dim] * body.world.gridSize[dim] - body.offset[dim];
           continue;
         }
-        if (
-          body.gridPosition[dim] * body.world.gridSize[dim] !=
-          body.sprite[dim]
-        ) {
+        if (body.gridPosition[dim] * body.world.gridSize[dim] != body.sprite[dim] + body.offset[dim]) {
           body.sprite[dim] += body.velocity[dim] * elapsedTime;
           next[dim] = body.sprite[dim] + body.velocity[dim] * elapsedTime;
         }
-        if (
-          body.velocity[dim] > 0 &&
-          next[dim] > body.gridPosition[dim] * body.world.gridSize[dim]
-        ) {
+        if (body.velocity[dim] > 0
+          && next[dim] > body.gridPosition[dim] * body.world.gridSize[dim] - body.offset[dim]) {
           // Nästa steg är klart!
           body.isLocked[dim] = false; // Kan sätta ny gridPosition och velocity!
         }
-        if (
-          body.velocity[dim] < 0 &&
-          next[dim] < body.gridPosition[dim] * body.world.gridSize[dim]
-        ) {
+        if (body.velocity[dim] < 0
+          && next[dim] < body.gridPosition[dim] * body.world.gridSize[dim] - body.offset[dim]) {
           // Nästa steg är klart!
           body.isLocked[dim] = false; // Kan sätta ny gridPosition och velocity!
         }

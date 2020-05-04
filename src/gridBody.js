@@ -252,8 +252,8 @@ class GridBody {
 
   snapToGrid() {
     this.gridPosition = {
-      x: Math.round(this.sprite.x / this.world.gridSize.x),
-      y: Math.round(this.sprite.y / this.world.gridSize.y)
+      x: Math.round((this.sprite.x + this.offset.x) / this.world.gridSize.x),
+      y: Math.round((this.sprite.y + this.offset.y) / this.world.gridSize.y)
     };
     this.sprite.x = this.world.gridSize.x * this.gridPosition.x - this.offset.x;
     this.sprite.y = this.world.gridSize.y * this.gridPosition.y - this.offset.y;
