@@ -472,15 +472,15 @@ var World = function () {
               body.sprite[dim] = body.gridPosition[dim] * body.world.gridSize[dim] - body.offset[dim];
               continue;
             }
-            if (body.gridPosition[dim] * body.world.gridSize[dim] != body.sprite[dim]) {
+            if (body.gridPosition[dim] * body.world.gridSize[dim] != body.sprite[dim] + body.offset[dim]) {
               body.sprite[dim] += body.velocity[dim] * elapsedTime;
               next[dim] = body.sprite[dim] + body.velocity[dim] * elapsedTime;
             }
-            if (body.velocity[dim] > 0 && next[dim] > body.gridPosition[dim] * body.world.gridSize[dim]) {
+            if (body.velocity[dim] > 0 && next[dim] > body.gridPosition[dim] * body.world.gridSize[dim] - body.offset[dim]) {
               // Nästa steg är klart!
               body.isLocked[dim] = false; // Kan sätta ny gridPosition och velocity!
             }
-            if (body.velocity[dim] < 0 && next[dim] < body.gridPosition[dim] * body.world.gridSize[dim]) {
+            if (body.velocity[dim] < 0 && next[dim] < body.gridPosition[dim] * body.world.gridSize[dim] - body.offset[dim]) {
               // Nästa steg är klart!
               body.isLocked[dim] = false; // Kan sätta ny gridPosition och velocity!
             }
@@ -1109,8 +1109,8 @@ var GridBody = function () {
     key: "snapToGrid",
     value: function snapToGrid() {
       this.gridPosition = {
-        x: Math.round(this.sprite.x / this.world.gridSize.x),
-        y: Math.round(this.sprite.y / this.world.gridSize.y)
+        x: Math.round((this.sprite.x + this.offset.x) / this.world.gridSize.x),
+        y: Math.round((this.sprite.y + this.offset.y) / this.world.gridSize.y)
       };
       this.sprite.x = this.world.gridSize.x * this.gridPosition.x - this.offset.x;
       this.sprite.y = this.world.gridSize.y * this.gridPosition.y - this.offset.y;
